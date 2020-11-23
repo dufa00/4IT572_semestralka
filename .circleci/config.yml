@@ -10,7 +10,7 @@ jobs:
       - checkout
       - run: npm install
       - run: npm run test
-      - run: npm run build
+      - run: npm build
       - persist_to_workspace:
         root: .
         paths:

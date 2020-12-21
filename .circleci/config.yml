@@ -20,8 +20,7 @@ jobs:
      steps:
         - attach_workspace:
            at: .
-        - run:
-           command: ./node_modules/.bin/firebase deploy --token "$FIREBASE_TOKEN"
+        
 
 workflows:
   version: 2.1

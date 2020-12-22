@@ -11,7 +11,7 @@ orbs:
   ansible-playbook: orbss/ansible-playbook@0.0.5
 jobs:
   build:
-    <<: *vse
+    docker: *vse
     steps:
       - checkout
       - run: npm install

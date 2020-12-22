@@ -2,6 +2,17 @@
   hosts: localhost
   connection: local
 
+tasks:
+    - name: Gathering info
+      vars:
+        ansible_python_interpreter: /usr/local/bin/python3
+      ec2_instance_info:
+        region: us-east-1
+        aws_access_key: ASIARIV6EYMEFV7EMLZA
+        aws_secret_key: h01zUIxDe85R0PTiJpOoUZ0j4MEaCn7P4j38N2lH
+        security_token: FwoGZXIvYXdzEDgaDMYwBZzuPL8xZkMiqyLCAaDfxE00z9qLM1KgLWBF9zIi7NKWzXPmSADj5O597gzYRz8YQhq8fQQkd3lYr5pvfXb7ziBKNtYDrQ0Udk8LPQkO+OjJUqInQkzRkOhIKO0S7GAhw3MYfZC1wqAE4ClBdqdzbhFBawE0/g/WfXTUltmrF6vTB/stNHTInUtTXdOzkuIr6Bn6NYMujviCgQAT6fPyDx2cPNnp6q6flHLyHEBwGvOiEZeOuNurITB6CIkKQGF+2uhUiwU/iY/MeBhqka5dKJjP2P4FMi3C5HYZTYSuHmolGs5NfzPFuZEWSBsBGN05ELpGW3J0V+CZc5nVTItsS30t4H4=
+      register: ec2_info
+      
   tasks:
     - name: Lauanch EC2 instance
       ec2:
@@ -58,7 +69,23 @@
     - wait_for:
         port: 80
 
+- name: Exterminate
+  hosts: localhost
+  connection: local
 
+  tasks:
+    - name: Exterminate
+      ec2:
+        region: us-east-1
+        state: 'absent'
+        instance_ids: '{{ item.instance_id }}'
+        aws_access_key: ASIARIV6EYMEFV7EMLZA
+        aws_secret_key: h01zUIxDe85R0PTiJpOoUZ0j4MEaCn7P4j38N2lH
+        security_token: FwoGZXIvYXdzEDgaDMYwBZzuPL8xZkMiqyLCAaDfxE00z9qLM1KgLWBF9zIi7NKWzXPmSADj5O597gzYRz8YQhq8fQQkd3lYr5pvfXb7ziBKNtYDrQ0Udk8LPQkO+OjJUqInQkzRkOhIKO0S7GAhw3MYfZC1wqAE4ClBdqdzbhFBawE0/g/WfXTUltmrF6vTB/stNHTInUtTXdOzkuIr6Bn6NYMujviCgQAT6fPyDx2cPNnp6q6flHLyHEBwGvOiEZeOuNurITB6CIkKQGF+2uhUiwU/iY/MeBhqka5dKJjP2P4FMi3C5HYZTYSuHmolGs5NfzPFuZEWSBsBGN05ELpGW3J0V+CZc5nVTItsS30t4H4=
+      
+      loop: "{{ ec2_info.instances }}"
+      loop_control:
+        label: "{{ item.instance_id }}"
 
 
 

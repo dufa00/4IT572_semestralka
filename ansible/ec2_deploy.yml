@@ -1,1 +1,66 @@
-zkouška
+- name: Deploy to EC2
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Lauanch EC2 instance
+      ec2:
+        instance_type: t2.small
+        image: ami-00ddb0e5626798373
+        region: us-east-1
+        key_name: test1
+        vpc_subnet_id: subnet-63b87052
+        assign_public_ip: yes
+        wait: yes
+        count: 1
+        group: eshop
+        aws_access_key: ASIARIV6EYMEFV7EMLZA
+        aws_secret_key: h01zUIxDe85R0PTiJpOoUZ0j4MEaCn7P4j38N2lH
+        security_token: FwoGZXIvYXdzEDgaDMYwBZzuPL8xZkMiqyLCAaDfxE00z9qLM1KgLWBF9zIi7NKWzXPmSADj5O597gzYRz8YQhq8fQQkd3lYr5pvfXb7ziBKNtYDrQ0Udk8LPQkO+OjJUqInQkzRkOhIKO0S7GAhw3MYfZC1wqAE4ClBdqdzbhFBawE0/g/WfXTUltmrF6vTB/stNHTInUtTXdOzkuIr6Bn6NYMujviCgQAT6fPyDx2cPNnp6q6flHLyHEBwGvOiEZeOuNurITB6CIkKQGF+2uhUiwU/iY/MeBhqka5dKJjP2P4FMi3C5HYZTYSuHmolGs5NfzPFuZEWSBsBGN05ELpGW3J0V+CZc5nVTItsS30t4H4=
+      register: ec2
+
+    - name: Add instance host to group
+      add_host: hostname={{ item.public_dns_name }} groupname=launched
+      with_items: '{{ec2.instances}}'
+
+    - name: Wait for SSH connection
+      wait_for: host={{ item.public_dns_name }} port=22 delay=30 timeout=300 state=started
+      with_items: '{{ec2.instances}}'
+
+- name: Configure EC2
+  hosts: launched
+  connection: ssh
+
+  tasks:
+    - name: Install docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+      become: yes
+    - service:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+    - name: Get project files from git
+      git:
+        repo: 'https://github.com/dufa00/4IT572_semestralka.git'
+        dest: ./app
+    - name: Build Docker with eshop
+      shell: cd app && docker build -t myeshop:latest .
+      become: yes
+    - name: Run Docker with eshop
+      shell: docker run -p 80:3000 eshop
+      async: 365
+      poll: 10
+      become: yes
+    - wait_for:
+        port: 80
+
+
+
+
+
+
+

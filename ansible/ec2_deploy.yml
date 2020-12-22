@@ -13,7 +13,6 @@ tasks:
         security_token: FwoGZXIvYXdzEAIaDEADWy3JC01cbZ/wBiLCAe0/HMaeV04QyPMLdVn+avyGe87qpKdEuNp1x4CRr15o9t++YMf7HM0E1E2Awzbpd1L+mHyYz5u1bzMsLvsRukCnDBSeKAzMIxntQrNWNUVMbOdKOwwgWCRwvMFZKlu9WflJjn09HYzTmf1lb4LYs+/UijkoD+LRHn89FdCMGA9nU7GdtXVRKMPTXsmSjnQ3RBU1i6C5SAN5bVtRjv/OSuuBwWQ1+BmvygjBz5zonoVvjAv/sdMdKs5zqlk2Sy6bxPDgKOjwhP8FMi0rsXD7CzlHasI/fpmc5vK/w79z6wOCBPmlrlFTmeZF3nIE7zqFq7YbwYcQLnQ=
       register: ec2_info
       
-  tasks:
     - name: Lauanch EC2 instance
       ec2:
         instance_type: t2.small

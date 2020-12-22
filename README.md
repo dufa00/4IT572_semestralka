@@ -1,6 +1,6 @@
 ## Semestrální úloha
 
-Postupovala jsem prakticky stejně s kroky ve videích z praktických cvičení. Testy, které zabraňují v merge jsou taktéž udělané podle videí (v settings dané testy přes CircleCI, zde jsem zaškrtla však pouze build, protože jsem si nebyla jistá zda dávat i Deploy). Také jsem hledala v návodech jako CircleCI a stack overflow, nakonec když jsem nevěděla, tak jsem se zeptala kolegů na radu. Tímto jim chci poděkovat a dát kredit za to, že jsou ochotní a udělali si čas na mě mi vysvětlit, jak některé věci fungují. Tento předmět byl opravdu zajímavý a mohu s jistotou říct, že mi něco dal
+Postupovala jsem prakticky stejně s kroky ve videích z praktických cvičení. Testy, které zabraňují v merge jsou taktéž udělané podle videí (v settings dané testy přes CircleCI, zde jsem zaškrtla však pouze build, protože jsem si nebyla jistá zda dávat i Deploy, opravuji na oba dané testy, protože mi to dává více smyslu). Také jsem hledala v návodech jako CircleCI a stack overflow, nakonec když jsem nevěděla, tak jsem se zeptala kolegů na radu. Tímto jim chci poděkovat a dát kredit za to, že jsou ochotní a udělali si čas na mě mi vysvětlit, jak některé věci fungují. Tento předmět byl opravdu zajímavý a mohu s jistotou říct, že mi něco dal
 
 
 ## Installation Guide

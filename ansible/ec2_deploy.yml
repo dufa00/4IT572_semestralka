@@ -79,7 +79,7 @@
       shell: cd app && docker build -t myeshop:latest .
       become: yes
     - name: Run Docker with eshop
-      shell: docker run -p 80:3000 eshop
+      shell: docker run -p 80:3000 myeshop
       async: 365
       poll: 10
       become: yes

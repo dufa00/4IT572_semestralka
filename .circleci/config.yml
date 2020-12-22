@@ -1,6 +1,6 @@
-vse: 
+vse:
   docker: &vse
-    - image: circleci/node:8.11.3
+    - image: 'circleci/node:8.11.3'
 ansible:
   docker: &ansible
     - image: 'circleci/python:latest'
@@ -18,11 +18,11 @@ jobs:
       - run: npm run test
       - run: npm build
       - persist_to_workspace:
-         root: .
-         paths:
+          root: .
+          paths:
             - .
   deploy:
-     docker: *ansible
+    docker: *ansible
     steps:
       - attach_workspace:
           at: .
@@ -36,16 +36,14 @@ jobs:
       - ansible-playbook/playbook:
           playbook: ansible/ec2_deploy.yml
           playbook-options: --user ubuntu
-        
-
 workflows:
   version: 2.1
   build:
     jobs:
       - build
       - deploy:
-         requires:
+          requires:
             - build
-         filters:
+          filters:
             branches:
-               only: master
+              only: master

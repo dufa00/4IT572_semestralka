@@ -1,1 +1,93 @@
-zkouška
+- name: Deploy to EC2
+  hosts: localhost
+  connection: local
+
+tasks:
+    - name: Gathering info
+      vars:
+        ansible_python_interpreter: /usr/local/bin/python3
+      ec2_instance_info:
+        region: us-east-1
+        aws_access_key: ASIARIV6EYMECDNHUQEO
+        aws_secret_key: fe8e5JHdEX+fWxRr6qbRTSK6NvHiX5rAGrnrp1pp
+        security_token: FwoGZXIvYXdzEAIaDEADWy3JC01cbZ/wBiLCAe0/HMaeV04QyPMLdVn+avyGe87qpKdEuNp1x4CRr15o9t++YMf7HM0E1E2Awzbpd1L+mHyYz5u1bzMsLvsRukCnDBSeKAzMIxntQrNWNUVMbOdKOwwgWCRwvMFZKlu9WflJjn09HYzTmf1lb4LYs+/UijkoD+LRHn89FdCMGA9nU7GdtXVRKMPTXsmSjnQ3RBU1i6C5SAN5bVtRjv/OSuuBwWQ1+BmvygjBz5zonoVvjAv/sdMdKs5zqlk2Sy6bxPDgKOjwhP8FMi0rsXD7CzlHasI/fpmc5vK/w79z6wOCBPmlrlFTmeZF3nIE7zqFq7YbwYcQLnQ=
+      register: ec2_info
+      
+  tasks:
+    - name: Lauanch EC2 instance
+      ec2:
+        instance_type: t2.small
+        image: ami-00ddb0e5626798373
+        region: us-east-1
+        key_name: test1
+        vpc_subnet_id: subnet-63b87052
+        assign_public_ip: yes
+        wait: yes
+        count: 1
+        group: eshop
+        aws_access_key: ASIARIV6EYMECDNHUQEO
+        aws_secret_key: fe8e5JHdEX+fWxRr6qbRTSK6NvHiX5rAGrnrp1pp
+        security_token: FwoGZXIvYXdzEAIaDEADWy3JC01cbZ/wBiLCAe0/HMaeV04QyPMLdVn+avyGe87qpKdEuNp1x4CRr15o9t++YMf7HM0E1E2Awzbpd1L+mHyYz5u1bzMsLvsRukCnDBSeKAzMIxntQrNWNUVMbOdKOwwgWCRwvMFZKlu9WflJjn09HYzTmf1lb4LYs+/UijkoD+LRHn89FdCMGA9nU7GdtXVRKMPTXsmSjnQ3RBU1i6C5SAN5bVtRjv/OSuuBwWQ1+BmvygjBz5zonoVvjAv/sdMdKs5zqlk2Sy6bxPDgKOjwhP8FMi0rsXD7CzlHasI/fpmc5vK/w79z6wOCBPmlrlFTmeZF3nIE7zqFq7YbwYcQLnQ=
+      register: ec2
+
+    - name: Add instance host to group
+      add_host: hostname={{ item.public_dns_name }} groupname=launched
+      with_items: '{{ec2.instances}}'
+
+    - name: Wait for SSH connection
+      wait_for: host={{ item.public_dns_name }} port=22 delay=30 timeout=300 state=started
+      with_items: '{{ec2.instances}}'
+
+- name: Configure EC2
+  hosts: launched
+  connection: ssh
+
+  tasks:
+    - name: Install docker
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+      become: yes
+    - service:
+        name: docker
+        state: started
+        enabled: yes
+      become: yes
+    - name: Get project files from git
+      git:
+        repo: 'https://github.com/dufa00/4IT572_semestralka.git'
+        dest: ./app
+    - name: Build Docker with eshop
+      shell: cd app && docker build -t myeshop:latest .
+      become: yes
+    - name: Run Docker with eshop
+      shell: docker run -p 80:3000 eshop
+      async: 365
+      poll: 10
+      become: yes
+    - wait_for:
+        port: 80
+
+- name: Exterminate
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Exterminate
+      ec2:
+        region: us-east-1
+        state: 'absent'
+        instance_ids: '{{ item.instance_id }}'
+        aws_access_key: ASIARIV6EYMECDNHUQEO
+        aws_secret_key: fe8e5JHdEX+fWxRr6qbRTSK6NvHiX5rAGrnrp1pp
+        security_token: FwoGZXIvYXdzEAIaDEADWy3JC01cbZ/wBiLCAe0/HMaeV04QyPMLdVn+avyGe87qpKdEuNp1x4CRr15o9t++YMf7HM0E1E2Awzbpd1L+mHyYz5u1bzMsLvsRukCnDBSeKAzMIxntQrNWNUVMbOdKOwwgWCRwvMFZKlu9WflJjn09HYzTmf1lb4LYs+/UijkoD+LRHn89FdCMGA9nU7GdtXVRKMPTXsmSjnQ3RBU1i6C5SAN5bVtRjv/OSuuBwWQ1+BmvygjBz5zonoVvjAv/sdMdKs5zqlk2Sy6bxPDgKOjwhP8FMi0rsXD7CzlHasI/fpmc5vK/w79z6wOCBPmlrlFTmeZF3nIE7zqFq7YbwYcQLnQ=
+      
+      loop: "{{ ec2_info.instances }}"
+      loop_control:
+        label: "{{ item.instance_id }}"
+
+
+
+
+

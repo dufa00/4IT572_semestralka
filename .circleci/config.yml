@@ -22,10 +22,20 @@ jobs:
          paths:
             - .
   deploy:
-     <<: *vse
-     steps:
-        - attach_workspace:
-           at: .
+     docker: *ansible
+    steps:
+      - attach_workspace:
+          at: .
+      - ansible-playbook/install
+      - run:
+         command: |
+          sudo pip install boto boto3
+      - add_ssh_keys:
+         fingerprints:
+          - "df:b5:83:2e:b1:e1:33:8e:d2:fa:03:3b:2e:79:22:74:4c:d9:82:38"
+      - ansible-playbook/playbook:
+          playbook: ansible/ec2_deploy.yml
+          playbook-options: --user ubuntu
         
 
 workflows:

@@ -1,5 +1,5 @@
-vse: &vse
-  docker:
+vse: 
+  docker: &vse
     - image: circleci/node:8.11.3
 ansible:
   docker: &ansible
